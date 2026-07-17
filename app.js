@@ -1,6 +1,7 @@
 import { initFaceAnalyzer, startFaceAnalyzer, stopFaceAnalyzer, setFaceFilter } from './modules/faceAnalyzer.js';
 import { initAirPaint, startAirPaint, stopAirPaint, setPaintColor, setBrushSize, setContinuousPaint, clearPaintCanvas, savePaintCanvas, undoPaintCanvas, togglePaintEraser } from './modules/airPaint.js';
 import { initAirSynth, startAirSynth, stopAirSynth, setSynthWaveType, setSynthScale, setSynthDelay } from './modules/airSynth.js';
+import { initFaceRecognizer, startFaceRecognizer, stopFaceRecognizer, startUserRegistration, getRegisteredUsers, deleteUser } from './modules/faceRecognizer.js';
 
 // Elementos do DOM
 const webcam = document.getElementById('webcam');
@@ -26,7 +27,8 @@ let isCameraOn = false;
 const modulesInitialized = {
   face: false,
   paint: false,
-  synth: false
+  synth: false,
+  recognizer: false
 };
 
 // Configurações das abas (Títulos e Legendas)
@@ -42,6 +44,10 @@ const tabMetadata = {
   synth: {
     title: "Sintetizador por Gestos",
     subtitle: "Crie notas musicais e controle efeitos movendo as mãos no ar."
+  },
+  recognizer: {
+    title: "Gestão de Pessoas",
+    subtitle: "Cadastre e reconheça pessoas em tempo real com calibração inteligente de idade."
   }
 };
 
@@ -52,6 +58,7 @@ async function init() {
   setupFaceControls();
   setupPaintControls();
   setupSynthControls();
+  setupRecognizerControls();
   
   // Liga a webcam inicialmente
   const cameraStarted = await startCamera();
@@ -213,6 +220,8 @@ async function switchTab(tabName) {
         await initAirPaint(webcam, overlayCanvas, paintCanvas);
       } else if (tabName === 'synth') {
         await initAirSynth(webcam, overlayCanvas);
+      } else if (tabName === 'recognizer') {
+        await initFaceRecognizer(webcam, overlayCanvas, onUserListChanged, onRegistrationProgress);
       }
       modulesInitialized[tabName] = true;
     } catch (error) {
@@ -223,6 +232,10 @@ async function switchTab(tabName) {
   }
   
   hideLoading();
+  
+  if (tabName === 'recognizer') {
+    onUserListChanged(getRegisteredUsers());
+  }
   
   // Inicia a execução do módulo selecionado
   startActiveModule(tabName);
@@ -235,6 +248,8 @@ function startActiveModule(tabName) {
     startAirPaint();
   } else if (tabName === 'synth') {
     startAirSynth();
+  } else if (tabName === 'recognizer') {
+    startFaceRecognizer();
   }
 }
 
@@ -245,6 +260,8 @@ function stopActiveModule(tabName) {
     stopAirPaint();
   } else if (tabName === 'synth') {
     stopAirSynth();
+  } else if (tabName === 'recognizer') {
+    stopFaceRecognizer();
   }
 }
 
@@ -369,6 +386,105 @@ function setupSynthControls() {
     }
     setSynthDelay(val / 100);
   });
+}
+
+// Renderiza a tabela de pessoas cadastradas na interface
+function onUserListChanged(users) {
+  const tableBody = document.getElementById('registered-users-table-body');
+  if (!tableBody) return;
+  
+  if (users.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-table-text">Nenhuma pessoa cadastrada.</td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tableBody.innerHTML = users.map(user => {
+    const refinedAgeDisplay = user.refinedAge 
+      ? `<strong>${user.refinedAge} anos</strong>` 
+      : '<span style="color: var(--text-muted); font-style: italic;">Aguardando...</span>';
+      
+    return `
+      <tr>
+        <td>${user.name}</td>
+        <td>${user.realAge} anos</td>
+        <td>${refinedAgeDisplay}</td>
+        <td>
+          <button class="btn-delete-user" data-name="${user.name}">Excluir</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Atualiza o banner de progresso do cadastro/scanner
+function onRegistrationProgress(title, desc) {
+  const statusText = document.getElementById('recognizer-status-text');
+  const statusEmoji = document.getElementById('rec-status-emoji');
+  const statusCard = document.getElementById('recognizer-status-card');
+  
+  if (!statusText) return;
+  
+  statusText.innerText = `${title}: ${desc}`;
+  
+  if (title.includes("Concluído")) {
+    if (statusEmoji) statusEmoji.innerText = "🎉";
+    if (statusCard) {
+      statusCard.style.borderColor = 'var(--accent-green)';
+      statusCard.style.background = 'rgba(57, 255, 20, 0.08)';
+    }
+    // Restaura o scanner após 4 segundos
+    setTimeout(() => {
+      if (statusEmoji) statusEmoji.innerText = "🔍";
+      if (statusText) statusText.innerText = "Escaneando...";
+      if (statusCard) {
+        statusCard.style.borderColor = 'rgba(0, 240, 255, 0.15)';
+        statusCard.style.background = 'linear-gradient(135deg, rgba(0, 240, 255, 0.07), rgba(255, 0, 79, 0.07))';
+      }
+    }, 4000);
+  } else if (title.includes("Capturando")) {
+    if (statusEmoji) statusEmoji.innerText = "📸";
+    if (statusCard) {
+      statusCard.style.borderColor = 'var(--accent-yellow)';
+      statusCard.style.background = 'rgba(255, 235, 59, 0.08)';
+    }
+  }
+}
+
+// Configurar Controles do Gerenciador de Pessoas
+function setupRecognizerControls() {
+  const form = document.getElementById('register-face-form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('register-name');
+      const ageInput = document.getElementById('register-age');
+      
+      if (nameInput && ageInput) {
+        const name = nameInput.value.trim();
+        const age = ageInput.value;
+        
+        startUserRegistration(name, age);
+        form.reset();
+      }
+    });
+  }
+  
+  // Delegação de cliques para botões de exclusão na tabela
+  const tableBody = document.getElementById('registered-users-table-body');
+  if (tableBody) {
+    tableBody.addEventListener('click', (e) => {
+      if (e.target.classList.contains('btn-delete-user')) {
+        const name = e.target.getAttribute('data-name');
+        if (confirm(`Tem certeza que deseja excluir o cadastro de "${name}"?`)) {
+          deleteUser(name);
+        }
+      }
+    });
+  }
 }
 
 // Inicializa a aplicação ao carregar

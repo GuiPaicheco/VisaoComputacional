@@ -56,6 +56,16 @@
           </svg>
           <span>Sintetizador por Gestos</span>
         </button>
+
+        <button class="nav-item" data-tab="recognizer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Gestão de Pessoas</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -366,6 +376,71 @@
                 <h3>Osciloscópio de Áudio</h3>
                 <div class="visualizer-container">
                   <canvas id="synthVisualizer"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTEÚDO: GESTÃO DE PESSOAS E RECONHECIMENTO FACIAL -->
+          <div id="tab-content-recognizer" class="tab-content">
+            <div class="recognizer-settings">
+              <!-- Status do Scanner -->
+              <div class="metric-card main-metric" id="recognizer-status-card">
+                <div class="metric-icon" id="rec-status-emoji">🔍</div>
+                <div class="metric-info">
+                  <h3>Scanner de Rostos</h3>
+                  <div class="metric-value" id="recognizer-status-text">Escaneando...</div>
+                </div>
+              </div>
+
+              <!-- Formulário de Cadastro -->
+              <div class="section-card">
+                <h3>Cadastrar Novo Rosto</h3>
+                <form id="register-face-form" onsubmit="return false;">
+                  <div class="input-group">
+                    <label for="register-name">Nome Completo</label>
+                    <input type="text" id="register-name" placeholder="Ex: Guilherme Paicheco" required class="form-input">
+                  </div>
+                  <div class="input-group" style="margin-top: 0.75rem;">
+                    <label for="register-age">Idade Real (Anos)</label>
+                    <input type="number" id="register-age" placeholder="Ex: 25" min="1" max="120" required class="form-input">
+                  </div>
+                  
+                  <p class="instruction-text" style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted);">
+                    Posicione o rosto no centro da câmera antes de clicar. Capturaremos 3 amostras consecutivas para criar a assinatura biométrica.
+                  </p>
+
+                  <button type="submit" id="btn-register-face" class="btn btn-primary" style="width: 100%; margin-top: 1rem; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <line x1="19" y1="8" x2="19" y2="14"/>
+                      <line x1="22" y1="11" x2="16" y2="11"/>
+                    </svg>
+                    <span>Registrar Face</span>
+                  </button>
+                </form>
+              </div>
+
+              <!-- Lista de Pessoas Cadastradas -->
+              <div class="section-card">
+                <h3>Diretório de Pessoas Cadastradas</h3>
+                <div class="registered-users-list-wrapper">
+                  <table class="registered-table">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Idade (Real)</th>
+                        <th>Idade (IA Média)</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody id="registered-users-table-body">
+                      <tr>
+                        <td colspan="4" class="empty-table-text">Nenhuma pessoa cadastrada.</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

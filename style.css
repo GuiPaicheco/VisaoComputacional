@@ -825,6 +825,106 @@ input:checked + .slider-round:before {
   100% { transform: scale(1.08); }
 }
 
+/* Estilos de Formulários e Tabelas (Gestão de Pessoas) */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.02);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.registered-users-list-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.registered-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.registered-table th, .registered-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.registered-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding-bottom: 0.5rem;
+}
+
+.registered-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.registered-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.registered-table td {
+  color: var(--text-secondary);
+}
+
+.registered-table td:first-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.empty-table-text {
+  text-align: center;
+  color: var(--text-muted) !important;
+  font-style: italic;
+  padding: 1.5rem !important;
+}
+
+.btn-delete-user {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  color: #ff453a;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-user:hover {
+  background: rgba(255, 59, 48, 0.25);
+  transform: translateY(-1px);
+}
+
 /* Responsividade Básica */
 @media (max-width: 1024px) {
   .app-container {

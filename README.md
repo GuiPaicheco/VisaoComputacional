@@ -39,6 +39,13 @@ Um instrumento musical aéreo inspirado no Theremin com suporte harmônico e efe
 * **Efeito Delay (Eco):** Nó de atraso conectado na Web Audio API que gera ecologias de som reguláveis com feedback de 45%.
 * **Osciloscópio Neon:** Exibe um visualizador de onda em tempo real reagindo às modificações do som gerado.
 
+### 4. 👥 Gestão de Pessoas + Reconhecimento Facial
+Um banco de dados de biometria facial local integrado à câmera.
+* **Cadastro de Rosto:** Registra rostos a partir de um formulário lateral (Nome e Idade Real). O sistema extrai e calibra a assinatura com 3 amostras consecutivas.
+* **Persistência de Dados:** Salva os vetores das assinaturas faciais diretamente no `localStorage` do navegador para funcionamento totalmente local e offline.
+* **Reconhecimento Biométrico:** Rastreia as pessoas na câmera cruzando os descritores faciais de 128 dimensões com o `FaceMatcher` do `face-api.js` (tolerância de distância Euclidiana de 0.6).
+* **Aprimoramento Contínuo de Idade:** A IA monitora as previsões de idade de rostos reconhecidos e gera uma **média móvel histórica acumulada**. Isso elimina as oscilações naturais do modelo, estabilizando e aprimorando a suposição final.
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
