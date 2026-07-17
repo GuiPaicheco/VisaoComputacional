@@ -1,6 +1,6 @@
-import { initFaceAnalyzer, startFaceAnalyzer, stopFaceAnalyzer } from './modules/faceAnalyzer.js';
-import { initAirPaint, startAirPaint, stopAirPaint, setPaintColor, setBrushSize, setContinuousPaint, clearPaintCanvas, savePaintCanvas } from './modules/airPaint.js';
-import { initAirSynth, startAirSynth, stopAirSynth, setSynthWaveType } from './modules/airSynth.js';
+import { initFaceAnalyzer, startFaceAnalyzer, stopFaceAnalyzer, setFaceFilter } from './modules/faceAnalyzer.js';
+import { initAirPaint, startAirPaint, stopAirPaint, setPaintColor, setBrushSize, setContinuousPaint, clearPaintCanvas, savePaintCanvas, undoPaintCanvas, togglePaintEraser } from './modules/airPaint.js';
+import { initAirSynth, startAirSynth, stopAirSynth, setSynthWaveType, setSynthScale, setSynthDelay } from './modules/airSynth.js';
 
 // Elementos do DOM
 const webcam = document.getElementById('webcam');
@@ -49,6 +49,7 @@ const tabMetadata = {
 async function init() {
   setupNavigation();
   setupCameraControls();
+  setupFaceControls();
   setupPaintControls();
   setupSynthControls();
   
@@ -262,6 +263,19 @@ function setupCameraControls() {
   });
 }
 
+// Configurar Controles do Espelho Inteligente (AR)
+function setupFaceControls() {
+  const filterBtns = document.querySelectorAll('.ar-filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filterName = btn.getAttribute('data-filter');
+      setFaceFilter(filterName);
+    });
+  });
+}
+
 // Configurar Controles do Air Paint
 function setupPaintControls() {
   // Seletor de Cores
@@ -272,15 +286,15 @@ function setupPaintControls() {
   colorBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       colorBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       
-      if (btn.id === 'custom-color-trigger') {
-        customColorInput.click();
-      } else {
-        btn.classList.add('active');
-        const color = btn.getAttribute('data-color');
-        setPaintColor(color);
-      }
+      const color = btn.getAttribute('data-color');
+      setPaintColor(color);
     });
+  });
+  
+  customColorTrigger.addEventListener('click', () => {
+    customColorInput.click();
   });
   
   customColorInput.addEventListener('input', (e) => {
@@ -306,13 +320,22 @@ function setupPaintControls() {
     setContinuousPaint(e.target.checked);
   });
   
+  // Botão Borracha
+  const eraserToggleBtn = document.getElementById('eraser-toggle-btn');
+  eraserToggleBtn.addEventListener('click', () => {
+    const isEraser = togglePaintEraser();
+    eraserToggleBtn.classList.toggle('active', isEraser);
+  });
+
   // Botões de Ação
+  document.getElementById('undo-canvas-btn').addEventListener('click', undoPaintCanvas);
   document.getElementById('clear-canvas-btn').addEventListener('click', clearPaintCanvas);
   document.getElementById('save-canvas-btn').addEventListener('click', savePaintCanvas);
 }
 
 // Configurar Controles do Air Synth
 function setupSynthControls() {
+  // Seletores de Forma de Onda
   const waveBtns = document.querySelectorAll('.wave-btn');
   waveBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -321,6 +344,30 @@ function setupSynthControls() {
       const waveType = btn.getAttribute('data-wave');
       setSynthWaveType(waveType);
     });
+  });
+
+  // Seletores de Escala
+  const scaleBtns = document.querySelectorAll('.scale-btn');
+  scaleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      scaleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const scaleName = btn.getAttribute('data-scale');
+      setSynthScale(scaleName);
+    });
+  });
+
+  // Slider de Delay (Eco)
+  const delaySlider = document.getElementById('delay-time');
+  const delayVal = document.getElementById('delay-val');
+  delaySlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    if (val === 0) {
+      delayVal.innerText = "Sem Eco";
+    } else {
+      delayVal.innerText = `${(val / 100).toFixed(2)}s`;
+    }
+    setSynthDelay(val / 100);
   });
 }
 

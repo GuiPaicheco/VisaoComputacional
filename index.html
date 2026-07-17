@@ -181,6 +181,28 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Filtros de Realidade Aumentada (AR) -->
+              <div class="section-card">
+                <h3>Filtros de Realidade Aumentada (AR)</h3>
+                <div class="ar-filters-grid">
+                  <button class="ar-filter-btn active" data-filter="none">
+                    <span>Nenhum</span>
+                  </button>
+                  <button class="ar-filter-btn" data-filter="visor">
+                    <span>Visor Cyberpunk</span>
+                  </button>
+                  <button class="ar-filter-btn" data-filter="horns">
+                    <span>Chifres Neon</span>
+                  </button>
+                  <button class="ar-filter-btn" data-filter="clown">
+                    <span>Nariz Palhaço</span>
+                  </button>
+                  <button class="ar-filter-btn" data-filter="mustache">
+                    <span>Bigode Cyber</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -198,12 +220,12 @@
               <div class="section-card">
                 <h3>Paleta de Cores</h3>
                 <div class="color-picker-grid">
-                  <button class="color-btn active" style="background-color: #ff007f;" data-color="#ff007f"></button>
-                  <button class="color-btn" style="background-color: #00f0ff;" data-color="#00f0ff"></button>
-                  <button class="color-btn" style="background-color: #39ff14;" data-color="#39ff14"></button>
-                  <button class="color-btn" style="background-color: #ffeb3b;" data-color="#ffeb3b"></button>
-                  <button class="color-btn" style="background-color: #ffffff;" data-color="#ffffff"></button>
-                  <button class="color-btn" style="background: linear-gradient(45deg, red, orange, yellow, green, blue, purple);" id="custom-color-trigger"></button>
+                  <button class="color-btn active" style="background-color: #ff007f;" data-color="#ff007f" title="Rosa Neon"></button>
+                  <button class="color-btn" style="background-color: #00f0ff;" data-color="#00f0ff" title="Ciano Neon"></button>
+                  <button class="color-btn" style="background-color: #39ff14;" data-color="#39ff14" title="Verde Neon"></button>
+                  <button class="color-btn" style="background-color: #ffeb3b;" data-color="#ffeb3b" title="Amarelo Neon"></button>
+                  <button class="color-btn" style="background: linear-gradient(45deg, red, orange, yellow, green, blue, purple);" data-color="rainbow" id="rainbow-brush-btn" title="Pincel Arco-Íris"></button>
+                  <button class="color-btn" style="background: #ffffff; border: 1px dashed #6b7280; display: flex; align-items: center; justify-content: center; font-size: 16px;" id="custom-color-trigger" title="Cor Customizada">🎨</button>
                 </div>
                 <input type="color" id="paint-color-input" value="#ff007f" style="display: none;">
               </div>
@@ -233,13 +255,27 @@
 
               <!-- Ações -->
               <div class="actions-grid">
+                <button id="undo-canvas-btn" class="btn btn-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7v6h6"/>
+                    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+                  </svg>
+                  <span>Desfazer</span>
+                </button>
+                <button id="eraser-toggle-btn" class="btn btn-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m20 20-6-6"/>
+                    <path d="M4 20h4l10-10L14 6 4 16v4Z"/>
+                  </svg>
+                  <span>Borracha</span>
+                </button>
                 <button id="clear-canvas-btn" class="btn btn-danger">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 6h18"/>
                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
                   </svg>
-                  <span>Limpar Tela</span>
+                  <span>Limpar</span>
                 </button>
                 <button id="save-canvas-btn" class="btn btn-primary">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -247,7 +283,7 @@
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                   </svg>
-                  <span>Salvar Imagem</span>
+                  <span>Salvar</span>
                 </button>
               </div>
             </div>
@@ -286,6 +322,31 @@
                     <span>Quadrada</span>
                   </button>
                 </div>
+              </div>
+
+              <!-- Escala Musical -->
+              <div class="section-card">
+                <h3>Modo de Notas (Escala)</h3>
+                <div class="scale-selectors">
+                  <button class="scale-btn active" data-scale="free">
+                    <span>Livre (Theremin)</span>
+                  </button>
+                  <button class="scale-btn" data-scale="pentatonic">
+                    <span>Pentatônica (Dó)</span>
+                  </button>
+                  <button class="scale-btn" data-scale="major">
+                    <span>Maior (Dó)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Delay (Eco) -->
+              <div class="section-card">
+                <div class="slider-header">
+                  <h3>Efeito de Delay (Eco)</h3>
+                  <span id="delay-val">Sem Eco</span>
+                </div>
+                <input type="range" id="delay-time" min="0" max="80" value="0" class="range-slider">
               </div>
 
               <!-- Frequência e Volume Atuais -->

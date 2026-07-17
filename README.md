@@ -8,25 +8,35 @@ O **VisionHub** é uma aplicação web portátil, leve e de alta performance que
 
 ## 🚀 Módulos do Sistema
 
-### 1. 👤 Espelho Inteligente (Análise Facial)
-Uma interface de espelho digital que analisa características do rosto do usuário em tempo real.
-* **Malha Facial:** Renderização cibernética e responsiva de 68 pontos fiduciais do rosto.
-* **Detecção de Emoções:** Classifica e exibe a distribuição de 7 emoções (Feliz, Triste, Surpreso, Bravo, Medo, Nojo, Neutro) com barras de progresso dinâmicas.
-* **Idade e Gênero:** Estimativa em tempo real com probabilidade de acerto.
+### 1. 👤 Espelho Inteligente + Filtros AR
+Uma interface de espelho digital que analisa características do rosto do usuário e projeta filtros interativos em tempo real.
+* **Malha Facial:** Renderização cibernética de 68 pontos fiduciais do rosto.
+* **Detecção de Emoções:** Classifica e exibe a distribuição de 7 emoções com barras de progresso dinâmicas.
+* **Idade e Gênero:** Estimativa com probabilidade de acerto.
+* **Filtros de Realidade Aumentada (AR):**
+  * **Visor Cyberpunk:** Retângulo neon ciano semi-transparente sobre os olhos, com scanlines, marcador lateral e texto digital HUD.
+  * **Chifres Neon:** Dois chifres magenta de neon brilhante posicionados e rotacionados automaticamente acima das sobrancelhas.
+  * **Nariz de Palhaço Interativo:** Nariz vermelho com efeito "honk" de ondas sonoras que cresce e pisca quando o usuário abre a boca.
+  * **Bigode Cyber:** Um bigode neon amarelo desenhado sobre o lábio superior que se inclina conforme a rotação do rosto.
 
 ### 2. 🎨 Pintura Aérea (Air Canvas)
-Um quadro virtual interativo que permite ao usuário pintar no ar.
-* **Rastreamento de Mão:** Usa a câmera para identificar as juntas e a ponta dos dedos.
-* **Gesto de Pinça:** Una o polegar ao indicador para começar a desenhar. Afaste os dedos para mover o cursor de pintura sem deixar traços.
-* **Personalização:** Opções para alterar a cor e o tamanho do pincel.
-* **Exportação:** Botão para salvar sua arte diretamente no computador como uma imagem PNG em alta definição sobre fundo escuro.
+Um quadro virtual interativo avançado que permite ao usuário pintar no ar com gestos.
+* **Rastreamento de Mão:** Rastreia e projeta o esqueleto da mão (21 pontos) em neon ciano e rosa.
+* **Gesto de Pinça:** Una o polegar ao indicador para desenhar. Afaste os dedos para mover o cursor (como um cursor normal).
+* **Modo Borracha:** Apaga traços desenhados utilizando o dedo indicador (representado por um cursor tracejado).
+* **Pincel Arco-Íris:** Modo de cor dinâmica que varia continuamente ao longo do espectro HSL enquanto desenha.
+* **Desfazer (Undo):** Histórico interno de 20 passos que permite remover o último traço desenhado.
+* **Exportação:** Salva sua arte diretamente no computador como arquivo PNG de alta definição sobre um fundo escuro premium.
 
 ### 3. 🎵 Sintetizador por Gestos (Air Synth)
-Um instrumento musical aéreo inspirado no Theremin.
-* **Síntese Web Audio:** Geração de ondas sonoras em tempo real diretamente no navegador (apoia ondas senoidais, triangulares, dente de serra e quadradas).
-* **Mapeamento Espacial:**
-  * **Eixo X (Movimento Lateral):** Controla o tom da nota (frequência de 120Hz a 1200Hz em escala logarítmica para maior harmonia).
-  * **Eixo Y (Movimento Vertical):** Controla o ganho de volume (mão no topo = som alto; mão abaixo = silêncio).
+Um instrumento musical aéreo inspirado no Theremin com suporte harmônico e efeitos.
+* **Síntese Web Audio:** Geração de ondas senoidais, triangulares, dente de serra e quadradas diretamente no browser.
+* **Controle Aéreo:** Movimento X modula a nota (120Hz a 1200Hz) e o movimento Y modula o volume (ganho).
+* **Modo de Notas (Escalas):** 
+  * **Livre:** Modo Theremin clássico sem afinação.
+  * **Pentatônica (Dó):** Trava a frequência nas notas da escala Pentatônica Maior de Dó, garantindo que qualquer melodia saia harmoniosa.
+  * **Maior (Dó):** Trava a frequência nas notas da escala Maior diatônica de Dó.
+* **Efeito Delay (Eco):** Nó de atraso conectado na Web Audio API que gera ecologias de som reguláveis com feedback de 45%.
 * **Osciloscópio Neon:** Exibe um visualizador de onda em tempo real reagindo às modificações do som gerado.
 
 ---

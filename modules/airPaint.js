@@ -15,6 +15,11 @@ let paintColor = "#ff007f";
 let brushSize = 8;
 let continuousPaint = false;
 let prevPoint = null; // { x, y } para ligar os traços anteriores
+let isEraser = false;
+let undoHistory = [];
+const maxHistorySteps = 20;
+let rainbowHue = 0;
+let wasPainting = false;
 
 // Estruturas para desenhar o esqueleto da mão
 const HAND_CONNECTIONS = [
@@ -197,6 +202,28 @@ export function setContinuousPaint(val) {
   prevPoint = null;
 }
 
+export function togglePaintEraser() {
+  isEraser = !isEraser;
+  return isEraser;
+}
+
+function saveToHistory() {
+  if (!paintCtx || !paintCanvasEl) return;
+  const imgData = paintCtx.getImageData(0, 0, paintCanvasEl.width, paintCanvasEl.height);
+  undoHistory.push(imgData);
+  if (undoHistory.length > maxHistorySteps) {
+    undoHistory.shift();
+  }
+}
+
+export function undoPaintCanvas() {
+  if (undoHistory.length === 0) return;
+  const lastState = undoHistory.pop();
+  paintCtx.clearRect(0, 0, paintCanvasEl.width, paintCanvasEl.height);
+  paintCtx.putImageData(lastState, 0, 0);
+  prevPoint = null;
+}
+
 // Raciocínio de Desenho
 function processDrawing(landmarks) {
   // Ponto 8 = Ponta do dedo indicador
@@ -228,43 +255,76 @@ function processDrawing(landmarks) {
     }
   }
 
+  // Resolve cor ativa (Arco-íris ou cor estática)
+  let activeColor = paintColor;
+  if (paintColor === 'rainbow' && !isEraser) {
+    rainbowHue = (rainbowHue + 2) % 360;
+    activeColor = `hsl(${rainbowHue}, 100%, 50%)`;
+  }
+
   if (shouldPaint) {
+    // Salva o estado atual na pilha de histórico no início de um novo traço
+    if (!wasPainting) {
+      saveToHistory();
+      wasPainting = true;
+    }
+
     if (prevPoint) {
-      // Desenha a linha no canvas de pintura
+      // Configura operação de composição de desenho (borracha ou pintura normal)
+      if (isEraser) {
+        paintCtx.globalCompositeOperation = 'destination-out';
+        paintCtx.strokeStyle = 'rgba(0,0,0,1)'; // Cor irrelevante, apaga
+        paintCtx.shadowBlur = 0;
+      } else {
+        paintCtx.globalCompositeOperation = 'source-over';
+        paintCtx.strokeStyle = activeColor;
+        paintCtx.shadowColor = activeColor;
+        paintCtx.shadowBlur = brushSize / 2;
+      }
+
       paintCtx.beginPath();
-      paintCtx.strokeStyle = paintColor;
       paintCtx.lineWidth = brushSize;
       paintCtx.lineCap = 'round';
       paintCtx.lineJoin = 'round';
-      
-      // Desenha com brilho neon suave
-      paintCtx.shadowColor = paintColor;
-      paintCtx.shadowBlur = brushSize / 2;
       
       paintCtx.moveTo(prevPoint.x, prevPoint.y);
       paintCtx.lineTo(x, y);
       paintCtx.stroke();
       
-      // Reseta sombra para não sobrecarregar
       paintCtx.shadowBlur = 0;
     }
     prevPoint = { x, y };
   } else {
-    // Se soltou o gesto, limpa a ligação de pontos para poder começar um novo traço separado
     prevPoint = null;
+    wasPainting = false;
   }
+
+  // Configura a operação de composição de volta ao padrão
+  paintCtx.globalCompositeOperation = 'source-over';
 
   // Desenha um cursor indicador brilhante no canvas de sobreposição (holograma)
   overlayCtx.beginPath();
-  overlayCtx.arc(x, y, shouldPaint ? brushSize / 2 + 4 : 8, 0, 2 * Math.PI);
-  overlayCtx.fillStyle = shouldPaint ? paintColor : 'rgba(255, 255, 255, 0.4)';
-  overlayCtx.strokeStyle = shouldPaint ? '#ffffff' : paintColor;
-  overlayCtx.lineWidth = 2;
-  overlayCtx.shadowColor = paintColor;
-  overlayCtx.shadowBlur = 10;
-  overlayCtx.fill();
-  overlayCtx.stroke();
-  overlayCtx.shadowBlur = 0;
+  overlayCtx.arc(x, y, shouldPaint ? brushSize / 2 + 5 : 8, 0, 2 * Math.PI);
+  
+  if (isEraser) {
+    overlayCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    overlayCtx.strokeStyle = '#ff007f';
+    overlayCtx.lineWidth = 1.5;
+    overlayCtx.setLineDash([4, 4]); // Borda tracejada para borracha
+    overlayCtx.stroke();
+  } else {
+    overlayCtx.fillStyle = shouldPaint ? activeColor : 'rgba(255, 255, 255, 0.3)';
+    overlayCtx.strokeStyle = shouldPaint ? '#ffffff' : activeColor;
+    overlayCtx.lineWidth = 2;
+    overlayCtx.shadowColor = activeColor;
+    overlayCtx.shadowBlur = 10;
+    overlayCtx.setLineDash([]); // Linha contínua
+    overlayCtx.fill();
+    overlayCtx.stroke();
+    overlayCtx.shadowBlur = 0;
+  }
+  
+  overlayCtx.setLineDash([]); // Limpa pontilhado para os próximos desenhos do esqueleto
 }
 
 // Desenhar o Esqueleto da Mão no Canvas de Sobreposição (Holográfico)

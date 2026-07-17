@@ -5,6 +5,11 @@ let canvasEl = null;
 let ctx = null;
 let animationFrameId = null;
 let isRunning = false;
+let activeFilter = 'none';
+
+export function setFaceFilter(filterName) {
+  activeFilter = filterName;
+}
 
 // Dicionário de tradução e emojis para as emoções
 const emotionMap = {
@@ -95,6 +100,7 @@ async function predictionLoop() {
         // Renderiza elementos visuais personalizados e estatísticas para a primeira pessoa detectada
         const detection = detections[0];
         drawCustomLandmarks(detection);
+        drawARFilter(detection);
         updateFaceMetrics(detection);
       } else {
         resetMetricsUI();
@@ -234,4 +240,192 @@ function resetMetricsUI() {
       label.innerText = `0%`;
     }
   });
+}
+
+// Desenhar Filtros de Realidade Aumentada (AR)
+function drawARFilter(detection) {
+  if (activeFilter === 'none') return;
+
+  const positions = detection.landmarks.positions;
+  
+  // Calcula escalas gerais e ângulo
+  const leftEyeOuter = positions[36];
+  const rightEyeOuter = positions[45];
+  const eyeDist = Math.hypot(rightEyeOuter.x - leftEyeOuter.x, rightEyeOuter.y - leftEyeOuter.y);
+  const angle = Math.atan2(rightEyeOuter.y - leftEyeOuter.y, rightEyeOuter.x - leftEyeOuter.x);
+  const midEyeX = (leftEyeOuter.x + rightEyeOuter.x) / 2;
+  const midEyeY = (leftEyeOuter.y + rightEyeOuter.y) / 2;
+
+  ctx.save();
+
+  if (activeFilter === 'visor') {
+    // 1. VISOR CYBERPUNK
+    ctx.translate(midEyeX, midEyeY);
+    ctx.rotate(angle);
+
+    const visorW = eyeDist * 1.5;
+    const visorH = eyeDist * 0.38;
+    
+    // Brilho de neon ciano
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+    ctx.fillRect(-visorW / 2, -visorH / 2, visorW, visorH);
+    
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-visorW / 2, -visorH / 2, visorW, visorH);
+    
+    ctx.shadowBlur = 0;
+    
+    // Scanlines
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+    ctx.lineWidth = 1;
+    for (let y = -visorH / 2 + 3; y < visorH / 2; y += 4) {
+      ctx.beginPath();
+      ctx.moveTo(-visorW / 2 + 5, y);
+      ctx.lineTo(visorW / 2 - 5, y);
+      ctx.stroke();
+    }
+    
+    // Digital UI text details
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText('TARGET_LOCK', -visorW / 2 + 8, -visorH / 2 - 5);
+    ctx.fillText('SYS_OK 98%', visorW / 2 - 60, -visorH / 2 - 5);
+    
+    // Marcador lateral
+    ctx.fillStyle = '#ff007f';
+    ctx.fillRect(visorW / 2 - 10, -visorH / 4, 3, visorH / 2);
+  } 
+  else if (activeFilter === 'horns') {
+    // 2. CHIFRES DE NEON (Magenta)
+    const leftBrow = positions[19]; // Sobrancelha esquerda
+    const rightBrow = positions[24]; // Sobrancelha direita
+    const hornHeight = eyeDist * 0.75;
+    const baseW = eyeDist * 0.25;
+
+    // Chifre Esquerdo
+    ctx.save();
+    ctx.translate(leftBrow.x, leftBrow.y);
+    ctx.rotate(angle - 0.25);
+    
+    ctx.shadowColor = '#ff007f';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = 'rgba(255, 0, 127, 0.35)';
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 3;
+    
+    ctx.beginPath();
+    ctx.moveTo(-baseW / 2, 0);
+    ctx.bezierCurveTo(-baseW, -hornHeight * 0.4, -baseW * 1.5, -hornHeight * 0.8, -baseW * 0.5, -hornHeight);
+    ctx.bezierCurveTo(-baseW * 0.3, -hornHeight * 0.8, 0, -hornHeight * 0.4, baseW / 2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Chifre Direito
+    ctx.save();
+    ctx.translate(rightBrow.x, rightBrow.y);
+    ctx.rotate(angle + 0.25);
+    
+    ctx.shadowColor = '#ff007f';
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = 'rgba(255, 0, 127, 0.35)';
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 3;
+    
+    ctx.beginPath();
+    ctx.moveTo(baseW / 2, 0);
+    ctx.bezierCurveTo(baseW, -hornHeight * 0.4, baseW * 1.5, -hornHeight * 0.8, baseW * 0.5, -hornHeight);
+    ctx.bezierCurveTo(baseW * 0.3, -hornHeight * 0.8, 0, -hornHeight * 0.4, -baseW / 2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  } 
+  else if (activeFilter === 'clown') {
+    // 3. NARIZ DE PALHAÇO INTERATIVO (Vermelho neon com efeito honk)
+    const noseTip = positions[30];
+    const upperLip = positions[51];
+    const lowerLip = positions[57];
+    
+    // Verifica se a boca está aberta
+    const mouthOpenDist = Math.hypot(lowerLip.x - upperLip.x, lowerLip.y - upperLip.y);
+    const isMouthOpen = mouthOpenDist / eyeDist > 0.25;
+    
+    const radius = isMouthOpen ? eyeDist * 0.32 : eyeDist * 0.18;
+    
+    ctx.translate(noseTip.x, noseTip.y);
+    ctx.rotate(angle);
+    
+    ctx.shadowColor = '#ff3b30';
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = isMouthOpen ? '#ff453a' : '#ff3b30';
+    
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    ctx.strokeStyle = isMouthOpen ? '#ffeb3b' : '#ffffff';
+    ctx.lineWidth = isMouthOpen ? 4 : 2;
+    ctx.stroke();
+    
+    // Reflexo de luz
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.beginPath();
+    ctx.arc(-radius * 0.3, -radius * 0.3, radius * 0.22, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    if (isMouthOpen) {
+      ctx.strokeStyle = '#ff9f0a';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#ff9f0a';
+      ctx.shadowBlur = 10;
+      
+      // Desenha ondas sonoras (Honk!)
+      ctx.beginPath();
+      ctx.arc(0, 0, radius + 15, Math.PI * 0.7, Math.PI * 1.3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, radius + 25, Math.PI * 0.8, Math.PI * 1.2);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.arc(0, 0, radius + 15, -Math.PI * 0.3, Math.PI * 0.3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, radius + 25, -Math.PI * 0.2, Math.PI * 0.2);
+      ctx.stroke();
+    }
+  } 
+  else if (activeFilter === 'mustache') {
+    // 4. BIGODE CYBER
+    const mouthCenter = positions[51];
+    ctx.translate(mouthCenter.x, mouthCenter.y);
+    ctx.rotate(angle);
+    
+    const mustW = eyeDist * 1.0;
+    const mustH = eyeDist * 0.2;
+    
+    ctx.shadowColor = '#ffeb3b';
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = '#ffeb3b';
+    ctx.fillStyle = 'rgba(255, 235, 59, 0.2)';
+    ctx.lineWidth = 3;
+    
+    ctx.beginPath();
+    ctx.moveTo(0, -3);
+    ctx.bezierCurveTo(-mustW * 0.25, -mustH * 0.8, -mustW * 0.45, -mustH * 0.6, -mustW * 0.5, mustH * 0.1);
+    ctx.bezierCurveTo(-mustW * 0.45, mustH * 0.3, -mustW * 0.3, mustH * 0.1, 0, mustH * 0.35);
+    ctx.bezierCurveTo(mustW * 0.3, mustH * 0.1, mustW * 0.45, mustH * 0.3, mustW * 0.5, mustH * 0.1);
+    ctx.bezierCurveTo(mustW * 0.45, -mustH * 0.6, mustW * 0.25, -mustH * 0.8, 0, -3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  ctx.restore();
 }

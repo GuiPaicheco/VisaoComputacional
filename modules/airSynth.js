@@ -12,13 +12,32 @@ let audioCtx = null;
 let oscillator = null;
 let gainNode = null;
 let analyserNode = null;
+let delayNode = null;
+let feedbackNode = null;
 let isAudioInitialized = false;
 
 // Configurações do Sintetizador
 let waveType = 'sine';
+let activeScale = 'free';
+let activeDelayTime = 0;
 const minFreq = 120;  // Grave (Hz)
 const maxFreq = 1200; // Agudo (Hz)
 const maxVolume = 0.15; // Volume de segurança para não distorcer
+
+// Frequências para alinhamento musical (Escalas de Dó Maior nas oitavas 3, 4, 5 e 6)
+const PENTATONIC_SCALE = [
+  130.81, 146.83, 164.81, 196.00, 220.00, // Oitava 3 (C3-A3)
+  261.63, 293.66, 329.63, 392.00, 440.00, // Oitava 4 (C4-A4)
+  523.25, 587.33, 659.25, 783.99, 880.00, // Oitava 5 (C5-A5)
+  1046.50, 1174.66, 1318.51               // Oitava 6 (C6-E6)
+];
+
+const MAJOR_SCALE = [
+  130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, // Oitava 3 (C3-B3)
+  261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, // Oitava 4 (C4-B4)
+  523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, // Oitava 5 (C5-B5)
+  1046.50, 1174.66, 1318.51                               // Oitava 6 (C6-E6)
+];
 
 // Elementos de UI específicos do Synth
 let freqDisplay = null;
@@ -107,20 +126,37 @@ function initAudio() {
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Cria oscilador e controle de ganho
+    // Cria oscilador, controle de ganho, analisador, delay e feedback
     oscillator = audioCtx.createOscillator();
     gainNode = audioCtx.createGain();
     analyserNode = audioCtx.createAnalyser();
+    delayNode = audioCtx.createDelay(1.0); // Máximo delay de 1.0s
+    feedbackNode = audioCtx.createGain();
     
     // Configura tamanho do analisador (FFT) para o osciloscópio
     analyserNode.fftSize = 512;
     
-    // Conexões: Oscilador -> Volume -> Analisador -> Alto-falantes
+    // Configurações iniciais do Delay
+    delayNode.delayTime.setValueAtTime(activeDelayTime, audioCtx.currentTime);
+    feedbackNode.gain.setValueAtTime(activeDelayTime > 0 ? 0.45 : 0, audioCtx.currentTime);
+    
+    // Conexões de áudio:
+    // 1. Sinal Seco (Direct path)
     oscillator.connect(gainNode);
     gainNode.connect(analyserNode);
+    
+    // 2. Loop de Feedback de Delay (Echo loop)
+    gainNode.connect(delayNode);
+    delayNode.connect(feedbackNode);
+    feedbackNode.connect(delayNode);
+    
+    // 3. Conecta o sinal molhado (wet delay) no Analisador
+    delayNode.connect(analyserNode);
+    
+    // 4. Analisador para a Saída Física
     analyserNode.connect(audioCtx.destination);
     
-    // Configuração inicial
+    // Configuração inicial do oscilador
     oscillator.type = waveType;
     oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
     
@@ -229,7 +265,14 @@ function processSynth(landmarks) {
   const controlX = Math.max(0, Math.min(1, 1 - indexTip.x));
   
   // Escala Logarítmica para Frequência (soará muito mais musical)
-  const frequency = minFreq * Math.pow(maxFreq / minFreq, controlX);
+  let frequency = minFreq * Math.pow(maxFreq / minFreq, controlX);
+  
+  // Alinhamento com escalas musicais se ativado
+  if (activeScale === 'pentatonic') {
+    frequency = snapToScale(frequency, PENTATONIC_SCALE);
+  } else if (activeScale === 'major') {
+    frequency = snapToScale(frequency, MAJOR_SCALE);
+  }
   
   // 2. Mapeamento de Volume (Eixo Y)
   // Y = 0 é o topo da tela, Y = 1 é a base. Queremos maior volume no topo, então (1 - y)
@@ -243,7 +286,8 @@ function processSynth(landmarks) {
       audioCtx.resume();
     }
     
-    oscillator.frequency.setTargetAtTime(frequency, audioCtx.currentTime, 0.05);
+    // Rampa suave
+    oscillator.frequency.setTargetAtTime(frequency, audioCtx.currentTime, 0.04);
     gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.03);
   }
 
@@ -379,4 +423,29 @@ function visualizerLoop() {
   }
   
   visualizerFrameId = requestAnimationFrame(visualizerLoop);
+}
+
+// Configurar a escala musical externamente
+export function setSynthScale(scaleName) {
+  activeScale = scaleName;
+}
+
+// Configurar o tempo de eco (delay) externamente
+export function setSynthDelay(time) {
+  activeDelayTime = time;
+  if (delayNode && feedbackNode && audioCtx) {
+    // Rampa suave para a nova linha de retardo
+    delayNode.delayTime.setTargetAtTime(time, audioCtx.currentTime, 0.15);
+    
+    // Regula feedback (quanto maior o delay, mais repetitivo, mas limitado a 45% para não distorcer)
+    const feedbackGain = time > 0 ? 0.45 : 0;
+    feedbackNode.gain.setTargetAtTime(feedbackGain, audioCtx.currentTime, 0.1);
+  }
+}
+
+// Função auxiliar para aproximar frequência à nota mais próxima da escala
+function snapToScale(freq, scaleArray) {
+  return scaleArray.reduce((prev, curr) => 
+    Math.abs(curr - freq) < Math.abs(prev - freq) ? curr : prev
+  );
 }

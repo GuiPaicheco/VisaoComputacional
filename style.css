@@ -742,6 +742,89 @@ input:checked + .slider-round:before {
   height: 100%;
 }
 
+/* Filtros de Realidade Aumentada (AR) */
+.ar-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.ar-filter-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.ar-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.ar-filter-btn.active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+}
+
+/* Escalas do Synth */
+.scale-selectors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.scale-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scale-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.scale-btn.active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--accent-cyan);
+}
+
+/* Botões Extras da Borracha e Pincel */
+#eraser-toggle-btn.active {
+  border-color: var(--accent-pink) !important;
+  background: rgba(255, 0, 127, 0.08) !important;
+  color: var(--accent-pink) !important;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.15);
+}
+
+#rainbow-brush-btn.active {
+  border-color: white !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
 /* Responsividade Básica */
 @media (max-width: 1024px) {
   .app-container {
