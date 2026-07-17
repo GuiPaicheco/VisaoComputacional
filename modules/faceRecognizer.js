@@ -286,6 +286,7 @@ function processDetection(detection) {
     displayText = `${label} | IA: ${Math.round(predictedAge)}a`;
   }
   
+  // Como removemos o espelhamento da câmera e do canvas nesta aba, desenhamos o texto normalmente de forma legível
   ctx.fillText(displayText, box.x, box.y - 8);
   ctx.restore();
 }

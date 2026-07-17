@@ -298,6 +298,11 @@ body {
   border-radius: 12px;
 }
 
+/* Remover espelhamento da câmera e do canvas em abas de reconhecimento */
+.no-mirror #webcam, .no-mirror #overlayCanvas {
+  transform: scaleX(1) !important;
+}
+
 #overlayCanvas {
   z-index: 2;
   pointer-events: none;
@@ -943,7 +948,19 @@ input:checked + .slider-round:before {
   }
   .nav-menu {
     flex-direction: row;
-    flex-grow: 0;
+    flex-grow: 1;
+    margin-left: 2rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    scrollbar-width: none; /* Firefox */
+  }
+  .nav-menu::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  .nav-item {
+    flex-shrink: 0; /* Impede que os botões se espremam */
   }
   .sidebar-footer {
     display: none;

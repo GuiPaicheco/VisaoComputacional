@@ -198,11 +198,20 @@ async function switchTab(tabName) {
   pageTitle.innerText = tabMetadata[tabName].title;
   pageSubtitle.innerText = tabMetadata[tabName].subtitle;
   
-  // Configura visibilidade do canvas de pintura
+  // Configura visibilidade do canvas de pintura e espelhamento
+  const viewportContainer = document.querySelector('.viewport-container');
   if (tabName === 'paint') {
     paintCanvas.style.display = 'block';
   } else {
     paintCanvas.style.display = 'none';
+  }
+  
+  if (viewportContainer) {
+    if (tabName === 'recognizer') {
+      viewportContainer.classList.add('no-mirror');
+    } else {
+      viewportContainer.classList.remove('no-mirror');
+    }
   }
   
   if (!isCameraOn) {
