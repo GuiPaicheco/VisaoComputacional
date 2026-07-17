@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionHub - Criatividade Computacional por Visão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar de Navegação -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3Z"/>
+            <path d="M12 11c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5Z"/>
+            <circle cx="12" cy="6" r="1"/>
+            <path d="M18 15V9a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v6"/>
+          </svg>
+        </div>
+        <span class="brand-name">Vision<span>Hub</span></span>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="face">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a6 6 0 0 0-12 0c0 4.97 4 9 9 9h1a2 2 0 0 0 2-2v-7Z"/>
+            <path d="M12 10v.01"/>
+            <path d="M9 10v.01"/>
+            <path d="M15 10v.01"/>
+            <path d="M12 14c-1.66 0-3-.67-3-1.5"/>
+          </svg>
+          <span>Espelho Inteligente</span>
+        </button>
+
+        <button class="nav-item" data-tab="paint">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+            <path d="M2 2l5 5"/>
+          </svg>
+          <span>Pintura Aérea</span>
+        </button>
+
+        <button class="nav-item" data-tab="synth">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18"/>
+            <path d="M17 7v10"/>
+            <path d="M22 9v6"/>
+            <path d="M7 5v14"/>
+            <path d="M2 10v4"/>
+          </svg>
+          <span>Sintetizador por Gestos</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator-container">
+          <span class="status-dot green"></span>
+          <span class="status-text">Webcam pronta</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área Principal de Conteúdo -->
+    <main class="main-content">
+      <!-- Cabeçalho -->
+      <header class="content-header">
+        <div>
+          <h1 id="page-title">Espelho Inteligente</h1>
+          <p id="page-subtitle">Análise de emoção, idade e mapeamento facial em tempo real.</p>
+        </div>
+        <button id="toggle-camera-btn" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-camera">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span>Desligar Câmera</span>
+        </button>
+      </header>
+
+      <!-- Grade de Visualização -->
+      <div class="dashboard-grid">
+        <!-- Coluna da Câmera -->
+        <section class="camera-card">
+          <div class="viewport-container">
+            <video id="webcam" autoplay playsinline muted></video>
+            <!-- Canvas para desenhar as sobreposições de IA (mesh facial, caixa, esqueleto da mão, etc.) -->
+            <canvas id="overlayCanvas"></canvas>
+            <!-- Canvas específico para pintar (persiste os desenhos no modo pintura) -->
+            <canvas id="paintCanvas"></canvas>
+            
+            <!-- Overlay de Carregamento dos Modelos de IA -->
+            <div id="loading-overlay" class="loading-overlay">
+              <div class="spinner-container">
+                <div class="glow-spinner"></div>
+                <div class="loading-logo">AI</div>
+              </div>
+              <h3 id="loading-title">Inicializando Modelos de IA</h3>
+              <p id="loading-progress">Isso pode levar alguns segundos na primeira execução...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Coluna de Controles e Estatísticas -->
+        <section class="controls-card">
+          
+          <!-- CONTEÚDO: ESPELHO INTELIGENTE -->
+          <div id="tab-content-face" class="tab-content active">
+            <div class="metrics-container">
+              <!-- Emoção Dominante -->
+              <div class="metric-card main-metric">
+                <div class="metric-icon" id="emotion-emoji">😐</div>
+                <div class="metric-info">
+                  <h3>Emoção Dominante</h3>
+                  <div class="metric-value" id="dominant-emotion">Aguardando...</div>
+                </div>
+              </div>
+
+              <!-- Idade e Gênero -->
+              <div class="grid-2-col">
+                <div class="metric-subcard">
+                  <span class="label">Idade Estimada</span>
+                  <div class="value" id="estimated-age">--</div>
+                </div>
+                <div class="metric-subcard">
+                  <span class="label">Gênero Previsto</span>
+                  <div class="value" id="estimated-gender">--</div>
+                </div>
+              </div>
+
+              <!-- Distribuição de Expressões -->
+              <div class="section-card">
+                <h3>Distribuição das Expressões</h3>
+                <div class="emotion-bars-list">
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Feliz</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-happy" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-happy">0%</span>
+                  </div>
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Triste</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-sad" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-sad">0%</span>
+                  </div>
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Surpreso</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-surprised" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-surprised">0%</span>
+                  </div>
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Bravo</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-angry" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-angry">0%</span>
+                  </div>
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Medo</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-fearful" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-fearful">0%</span>
+                  </div>
+                  <div class="emotion-bar-item">
+                    <span class="emotion-name">Neutro</span>
+                    <div class="progress-track">
+                      <div class="progress-bar" id="bar-neutral" style="width: 0%"></div>
+                    </div>
+                    <span class="emotion-val" id="val-neutral">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTEÚDO: PINTURA AÉREA -->
+          <div id="tab-content-paint" class="tab-content">
+            <div class="paint-settings">
+              <div class="section-card">
+                <h3>Instruções de Uso</h3>
+                <p class="instruction-text">
+                  Levante a sua mão para a câmera. Para desenhar, faça o gesto de <strong>pinça</strong> aproximando o polegar e o indicador. Afaste-os para mover o pincel sem pintar!
+                </p>
+              </div>
+
+              <!-- Seletor de Cores -->
+              <div class="section-card">
+                <h3>Paleta de Cores</h3>
+                <div class="color-picker-grid">
+                  <button class="color-btn active" style="background-color: #ff007f;" data-color="#ff007f"></button>
+                  <button class="color-btn" style="background-color: #00f0ff;" data-color="#00f0ff"></button>
+                  <button class="color-btn" style="background-color: #39ff14;" data-color="#39ff14"></button>
+                  <button class="color-btn" style="background-color: #ffeb3b;" data-color="#ffeb3b"></button>
+                  <button class="color-btn" style="background-color: #ffffff;" data-color="#ffffff"></button>
+                  <button class="color-btn" style="background: linear-gradient(45deg, red, orange, yellow, green, blue, purple);" id="custom-color-trigger"></button>
+                </div>
+                <input type="color" id="paint-color-input" value="#ff007f" style="display: none;">
+              </div>
+
+              <!-- Tamanho do Pincel -->
+              <div class="section-card">
+                <div class="slider-header">
+                  <h3>Tamanho do Pincel</h3>
+                  <span id="brush-size-val">8px</span>
+                </div>
+                <input type="range" id="brush-size" min="2" max="40" value="8" class="range-slider">
+              </div>
+
+              <!-- Modo de Pintura Contínua -->
+              <div class="section-card">
+                <div class="toggle-container">
+                  <div>
+                    <h3>Pintura Contínua</h3>
+                    <p class="toggle-desc">Pinta sempre que o indicador estiver visível, sem precisar pinçar.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="continuous-paint-toggle">
+                    <span class="slider-round"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Ações -->
+              <div class="actions-grid">
+                <button id="clear-canvas-btn" class="btn btn-danger">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                  </svg>
+                  <span>Limpar Tela</span>
+                </button>
+                <button id="save-canvas-btn" class="btn btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span>Salvar Imagem</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTEÚDO: SINTETIZADOR POR GESTOS -->
+          <div id="tab-content-synth" class="tab-content">
+            <div class="synth-settings">
+              <div class="section-card">
+                <h3>Como Funciona</h3>
+                <p class="instruction-text">
+                  Levante uma mão para ativar o som.
+                  <br>• Mover para os **lados (Eixo X)** controla o **Tom (Pitch)**.
+                  <br>• Mover para **cima e para baixo (Eixo Y)** controla o **Volume**.
+                </p>
+              </div>
+
+              <!-- Forma de Onda -->
+              <div class="section-card">
+                <h3>Tipo de Onda Sonora</h3>
+                <div class="wave-selectors">
+                  <button class="wave-btn active" data-wave="sine">
+                    <span class="wave-icon">~</span>
+                    <span>Senoide</span>
+                  </button>
+                  <button class="wave-btn" data-wave="triangle">
+                    <span class="wave-icon">▲</span>
+                    <span>Triangular</span>
+                  </button>
+                  <button class="wave-btn" data-wave="sawtooth">
+                    <span class="wave-icon">|/_</span>
+                    <span>Dente Serra</span>
+                  </button>
+                  <button class="wave-btn" data-wave="square">
+                    <span class="wave-icon">┌┐</span>
+                    <span>Quadrada</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Frequência e Volume Atuais -->
+              <div class="grid-2-col">
+                <div class="metric-subcard">
+                  <span class="label">Frequência</span>
+                  <div class="value font-mono" id="synth-freq">0 Hz</div>
+                </div>
+                <div class="metric-subcard">
+                  <span class="label">Volume</span>
+                  <div class="value font-mono" id="synth-volume">0%</div>
+                </div>
+              </div>
+
+              <!-- Visualizador / Osciloscópio -->
+              <div class="section-card">
+                <h3>Osciloscópio de Áudio</h3>
+                <div class="visualizer-container">
+                  <canvas id="synthVisualizer"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

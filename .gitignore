@@ -1,0 +1,19 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDEs/Editor settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Local Server/NPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.system_generated/
+*.log
