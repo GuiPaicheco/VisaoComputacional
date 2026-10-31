@@ -105,3 +105,25 @@ Para deploy instantâneo a cada `git push` com links de pré-visualização:
 2. Clique em **"Add New Project"** e selecione o repositório `VisaoComputacional`.
 3. Mantenha as configurações padrão (Framework Preset: *Other*, Build Command: *vazio*, Output Directory: *vazio*).
 4. Clique em **Deploy**. A Vercel gerará um subdomínio `.vercel.app` de carregamento ultra-rápido.
+
+---
+
+## Guia rápido do repositório
+
+Experimentos de visão computacional no navegador com filtros faciais, pintura aérea e interação por gestos.
+
+**Contexto:** Demonstração interativa.
+
+### Ambiente de desenvolvimento
+
+Clone o repositório e sirva os arquivos localmente. Com Python instalado:
+
+```bash
+git clone https://github.com/GuiPaicheco/VisaoComputacional.git
+cd VisaoComputacional
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+Abra [http://127.0.0.1:8000/index.html](http://127.0.0.1:8000/index.html). Preserve as pastas de imagens, estilos e scripts. Recursos externos, quando usados pela página, podem exigir conexão com a internet.
+
+Consulte os requisitos e as limitações nas seções acima antes de usar o sistema. Esta atualização revisa a documentação; não representa uma nova validação de execução ou de segurança.
